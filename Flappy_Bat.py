@@ -19,7 +19,7 @@ PIPE_GAP = 158
 TERMINAL_VELOCITY = 5.3
 GRAVITY = 0.145
 FLAP_SPEED = 20 
-BAT_JUMP = -4.7
+BAT_JUMP = -4.5
 PIPE_SPAWN = 800
 
 # These lines make the window appear and give it the title of "Flappy Bat"
@@ -41,6 +41,8 @@ font = pygame.font.Font('Flappy_Font.ttf', 50)
 smallFont = pygame.font.Font('Flappy_Font.ttf', 20)
 restart = pygame.image.load('Restart.png')
 restart = pygame.transform.scale(restart, (96, 96))
+exitGame = pygame.image.load('Exit.png')
+exitGame = pygame.transform.scale(exitGame, (96, 96))
 ground = pygame.image.load('Ground.png')
 
 # This is where the audio is loaded, but in repl audio cannot be played,
@@ -188,7 +190,7 @@ while running:
         # This detects whenever the mouse is pressed on the restart button area
         # during when the restart button is up, and restarts the game
         if event.type == pygame.MOUSEBUTTONDOWN: 
-            if batAlive == False and 450 - 48 <= mouse[0] <= 450 + 48 and 252 - 48 <= mouse[1] <= 252 + 48: 
+            if batAlive == False and 450 - 96 <= mouse[0] <= 450 and 252 - 48 <= mouse[1] <= 252 + 48: 
                 if audioSupported:
                     swoosh.play()
                 bat_y = BAT_START_Y
@@ -197,16 +199,24 @@ while running:
                 gameStarted = False
                 batAlive = True
                 score = 0 
-
+        
+        # This code is like the code above but for the exit button
+        if event.type == pygame.MOUSEBUTTONDOWN: 
+            if batAlive == False and 450 <= mouse[0] <= 450 + 96 and 252 - 48 <= mouse[1] <= 252 + 48: 
+                if audioSupported:
+                    swoosh.play()
+                running = False
+    
     # This puts up the text at the start of the game that says 
     # 'Flappy Bat' and 'Press space to start'
     if firstStart:
         screen.blit(font.render('Flappy Bat', False, (255, 255, 255)), (320, 120))
         screen.blit(smallFont.render('Press space to start', False, (255, 255, 255)), (350, 320))
 
-    # This tests when to draw the restart button
+    # This tests when to draw the restart and exit button
     if batAlive == False:
-        screen.blit(restart, (450 - 48, 252 - 48)) 
+        screen.blit(restart, (450 - 96, 252 - 48)) 
+        screen.blit(exitGame, (450, 252 - 48))
     
     # This is a necessary function for the display to actually work for pygame
     pygame.display.flip()
