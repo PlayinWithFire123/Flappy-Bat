@@ -1,12 +1,15 @@
 # Importing pygame functions and the random function
 import pygame
 import random
+import pandas as pd
+from datetime import datetime
 
 # Initializing pygame and font
 pygame.init()
 pygame.font.init()
 
 # These are all of the constants, which are variables that don't change
+USERNAME = 'sooylatte'
 SCREEN_WIDTH = 900
 SCREEN_HEIGHT = 504 + 111
 GROUND_Y = 504
@@ -70,6 +73,18 @@ frameCount = 1
 score = 0
 highScore = 0
 
+scores = []
+def add_score(score):
+    now = datetime.now()
+    dt_string = now.strftime("%m/%d/%Y %H:%M:%S")
+    scores.append([USERNAME, dt_string, str(score)])
+
+def print_leaderboard(cutoff=10):
+    leaderboard = pd.read_csv('leaderboard.csv', names=['Username', 'Timestamp', 'Score'])
+    leaderboard = leaderboard.sort_values(by='Score', ascending=False).head(cutoff)
+    leaderboard.index = range(1, len(leaderboard) + 1)
+    print("\n" + " " * 8 + f"-----CURRENT HIGH SCORES-----\n\n{leaderboard}")
+
 # This is a function that includes a nested list to set up the creation of the pipes
 # including the image, x, y, and hitbox
 def newPipe():
@@ -102,6 +117,7 @@ while running:
             batAlive = False
             if audioSupported:
                 hit.play()
+            add_score(score)
 
         # This makes it so the bat cannot fly over the pipes
         # but does not die when it goes into the sky
@@ -144,6 +160,7 @@ while running:
             if pipe[1].colliderect(flappy_bat_rect) and batAlive:
                 batAlive = False
                 hit.play()
+                add_score(score)
 
         # This spawns in new pipes
         if spawnPipe and batAlive:
@@ -221,5 +238,10 @@ while running:
     # This is a necessary function for the display to actually work for pygame
     pygame.display.flip()
 
+with open('leaderboard.csv', 'a+') as f:
+    for score in scores:
+        f.write(', '.join(score) + '\n')
+
 # This prints your all time high score once you are done playing the game
 print('Your high score was', highScore)
+print_leaderboard()
